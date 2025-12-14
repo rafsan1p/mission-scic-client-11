@@ -4,6 +4,7 @@ import { AuthContext } from '../Provider/AuthProvider';
 import { updateProfile } from 'firebase/auth';
 import auth from '../firebase/firebase.config';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Register = () => {
 
@@ -16,12 +17,14 @@ const Register = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
         const pass = e.target.password.value;
         const name = e.target.name.value;
-        const photoUrl = e.target.photoUrl.value;
+        const photoUrl = e.target.photoUrl;
+        const file = photoUrl.files[0];
+        console.log(file);
 
         const uppercase = /[A-Z]/;
         const lowercase = /[a-z]/;
@@ -35,12 +38,31 @@ const Register = () => {
         if(!lowercase.test(pass)){
             return toast.error("Password must contain at least one lowercase letter.");
         }
+        const imgbbKey = import.meta.env.VITE_IMGBB_API_KEY;
 
-        registerWithEmailPassword(email, pass)
+        const res = await axios.post(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {image:file}, {
+            headers:{
+                'Content-Type':'multipart/form-data'
+            }
+        })
+        const mainPhotoUrl = res.data.data.display_url
+
+
+        const formData = {
+            email,
+            name,
+            pass,
+            mainPhotoUrl
+        }
+
+
+
+        if(res.data.success == true){
+            registerWithEmailPassword(email, pass)
             .then((userCredential) => {
                 updateProfile(auth.currentUser, {
                     displayName: name,
-                    photoURL: photoUrl
+                    photoURL: mainPhotoUrl
                 }).then(() => {
                     sendVerificationEmail(userCredential.user)
                         .then(() => {
@@ -52,6 +74,11 @@ const Register = () => {
                             console.log(error);
                             toast.error('Failed to send verification email.');
                         });
+                    axios.post('http://localhost:5000/users', formData)
+                        .then(res => {
+                            console.log(res.data);
+                        });
+
                 }).catch((error) => {
                     console.log(error);
                     toast.error('Failed to update profile.');
@@ -65,6 +92,9 @@ const Register = () => {
                     toast.error('Registration failed.');
                 }
             });
+        }
+
+        
     }
 
     const googleSignup = () => {
@@ -124,7 +154,7 @@ const Register = () => {
                                 PhotoURL
                             </label>
                             <input name='photoUrl'
-                                type="text"
+                                type="file"
                                 placeholder="Enter your photoURL"
                                 className="input input-bordered w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                             />
