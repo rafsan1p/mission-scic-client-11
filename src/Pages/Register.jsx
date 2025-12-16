@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../Provider/AuthProvider';
 import { updateProfile } from 'firebase/auth';
@@ -16,6 +16,25 @@ const Register = () => {
     const {registerWithEmailPassword, sendVerificationEmail, logOut, handleGoogleSignin, setUser} = useContext(AuthContext);
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [upazilas, setUpazilas] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [district, setDistrict] = useState('');
+    const [upazila, setUpazila] = useState('');
+
+    useEffect(()=>{
+        axios.get('./upazila.json')
+        .then(res=>{
+            setUpazilas(res.data.upazilas)
+        })
+
+        axios.get('./district.json')
+        .then(res=>{
+            setDistricts(res.data.districts)
+        })
+    }, [])
+    
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +43,7 @@ const Register = () => {
         const name = e.target.name.value;
         const photoUrl = e.target.photoUrl;
         const file = photoUrl.files[0];
-        const role = e.target.role.value;
+        const blood = e.target.blood.value;
         
 
         const uppercase = /[A-Z]/;
@@ -54,48 +73,56 @@ const Register = () => {
             name,
             pass,
             mainPhotoUrl,
-            role
+            blood,
+            district,
+            upazila
         }
 
 
 
         if(res.data.success == true){
             registerWithEmailPassword(email, pass)
-            .then((userCredential) => {
-                updateProfile(auth.currentUser, {
-                    displayName: name,
-                    photoURL: mainPhotoUrl
-                }).then(() => {
-                    sendVerificationEmail(userCredential.user)
-                        .then(() => {
-                            toast.success('Registration successful! Please check your email/spam folder to verify your account.');
-                            logOut();
-                            navigate('/login');
-                        })
-                        .catch((error) => {
-                            console.log(error);
+                .then((userCredential) => {
+                    // Update Profile
+                    return updateProfile(auth.currentUser, {
+                        displayName: name,
+                        photoURL: mainPhotoUrl
+                    }).then(() => {
+                        // Send Verification Email
+                        return sendVerificationEmail(userCredential.user)
+                            .then(() => {
+                                // Save to Database
+                                return axios.post('http://localhost:5000/users', formData)
+                                    .then(res => {
+                                        console.log(res.data);
+                                    toast.success('Registration successful! Please check your email/spam folder to verify your account.');
+                                    logOut();
+                                    navigate('/login');
+                                })
+                                .catch(err => {
+                                    console.log('Database error:', err);
+                                    toast.error('Failed to save user data.');
+                                });
+                            })
+                            .catch((error) => {
+                            console.log('Email verification error:', error);
                             toast.error('Failed to send verification email.');
                         });
-                    axios.post('http://localhost:5000/users', formData)
-                        .then(res => {
-                            console.log(res.data);
-                        });
-
-                }).catch((error) => {
-                    console.log(error);
+                    });
+                })
+                .catch((error) => {
+                    console.log('Update profile error:', error);
                     toast.error('Failed to update profile.');
+                })
+                .catch(err => {
+                    console.log('Registration error:', err);
+                    if(err.code === 'auth/email-already-in-use'){
+                        toast.error('Email already in use.');
+                    } else {
+                        toast.error('Registration failed.');
+                    }
                 });
-            })
-            .catch(err => {
-                console.log(err);
-                if(err.code === 'auth/email-already-in-use'){
-                    toast.error('Email already in use.');
-                } else {
-                    toast.error('Registration failed.');
-                }
-            });
         }
-
         
     }
 
@@ -164,14 +191,46 @@ const Register = () => {
                         
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Choose a role
+                                Choose Blood Group
                             </label>
-                            <select name='role' defaultValue="Choose Role" className="select w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
-                                <option disabled={true}>Choose Role</option>
-                                <option value='manager'>Manager</option>
-                                <option value='buyer'>Buyer</option>
+                            <select name='blood' defaultValue="Choose Blood Group" className=" w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white transition-all">
+                                <option disabled={true}>Choose Blood Group</option>
+                                <option value='A+'>A+</option>
+                                <option value='A-'>A-</option>
+                                <option value='B+'>B+</option>
+                                <option value='B-'>B-</option>
+                                <option value='O+'>O+</option>
+                                <option value='O-'>O-</option>
+                                <option value='AB+'>AB+</option>
+                                <option value='AB-'>AB-</option>
+                                
                             </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Choose District
+                            </label>
+                            <select value={district} onChange={(e) => setDistrict(e.target.value)} defaultValue="Choose District" className=" w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white transition-all">
+                                <option disabled={true}>Select your District</option>
+                                {
+                                    districts.map(d=> <option value={d?.name} key={d.id}>{d?.name}</option>)
+                                }
+                                
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Choose Upazila
+                            </label>
+                            <select value={upazila} onChange={(e) => setUpazila(e.target.value)}  defaultValue="Choose Upazila" className=" w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white transition-all">
+                                <option disabled={true}>Select your Upazila</option>
+                                {
+                                    upazilas.map(u=> <option value={u?.name} key={u.id}>{u?.name}</option>)
+                                }
+                                
+                            </select>
+                        </div>
+
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">

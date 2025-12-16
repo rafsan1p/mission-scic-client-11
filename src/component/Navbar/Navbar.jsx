@@ -255,7 +255,7 @@ const Navbar = () => {
             </g>
           </svg>
         </label>
-        <Link to={'/dashboard/main'} className="btn btn-sm lg:btn-md">Dashboard</Link>
+        <Link to={'/dashboard'} className="btn btn-sm lg:btn-md">Dashboard</Link>
 
         {user && (
           <button onClick={handleSignOut} className="btn btn-sm lg:btn-md">

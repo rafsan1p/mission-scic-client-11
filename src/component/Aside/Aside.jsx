@@ -42,19 +42,19 @@ export default function Aside() {
         </div>
 
         <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <NavLink to="/dashboard/main" className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/dashboard" end className={navClass} onClick={() => setIsOpen(false)}>
             <Home className="w-5 h-5" />
             Dashboard
           </NavLink>
 
-          <NavLink to="/dashboard/add-product" className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/dashboard/add-request" className={navClass} onClick={() => setIsOpen(false)}>
             <PackagePlus className="w-5 h-5" />
-            Add Product
+            Add Request
           </NavLink>
 
-          <NavLink to="/dashboard/users" className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/dashboard/manage-product" className={navClass} onClick={() => setIsOpen(false)}>
             <BarChart3 className="w-5 h-5" />
-            Analytics
+            Manage Product
           </NavLink>
 
           <NavLink to="/users" className={navClass} onClick={() => setIsOpen(false)}>

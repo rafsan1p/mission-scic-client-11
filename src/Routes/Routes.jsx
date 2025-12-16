@@ -5,8 +5,9 @@ import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import DashboardLayout from "../DashboardLayout/DashboardLayout";
 import MainDashboard from "../Pages/Dashboard/MainDashboard/MainDashboard";
-import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
 import Error from "../Pages/Error";
+import ManageProduct from "../Pages/Dashboard/ManageProduct/ManageProduct";
+import AddRequest from "../Pages/Dashboard/AddRequest/AddRequest";
 
 
 
@@ -31,16 +32,20 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path:'/dashboard',
+        path:'dashboard',
         element:<DashboardLayout></DashboardLayout>,
         children:[
             {
-                path:'main',
+                path:'/dashboard',
                 element: <MainDashboard></MainDashboard>
             },
             {
-                path:'add-product',
-                element: <AddProduct></AddProduct>
+                path:'add-request',
+                element: <AddRequest></AddRequest>
+            },
+            {
+                path:'manage-product',
+                element: <ManageProduct></ManageProduct>
             }
         ]
     }
