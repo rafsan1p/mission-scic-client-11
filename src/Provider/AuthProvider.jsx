@@ -59,7 +59,8 @@ const AuthProvider = ({children}) => {
         handleGoogleSignin,
         loading,
         logOut,
-        sendVerificationEmail
+        sendVerificationEmail,
+        role
     }
 
     return <AuthContext.Provider value={authData}>

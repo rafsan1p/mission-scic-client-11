@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { AuthContext } from "../Provider/AuthProvider";
+import { AuthContext } from "../../Provider/AuthProvider";
 import { signOut } from "firebase/auth";
-import auth from "../firebase/firebase.config";
+import auth from "../../firebase/firebase.config";
 import toast from "react-hot-toast";
+import { Link } from "react-router";
 
 const Navbar = () => {
   const { user } = useContext(AuthContext);
@@ -145,7 +146,7 @@ const Navbar = () => {
               Home
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/services"
               className={({ isActive }) =>
@@ -199,7 +200,7 @@ const Navbar = () => {
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
         </ul>
       </div>
 
@@ -254,6 +255,7 @@ const Navbar = () => {
             </g>
           </svg>
         </label>
+        <Link to={'/dashboard/main'} className="btn btn-sm lg:btn-md">Dashboard</Link>
 
         {user && (
           <button onClick={handleSignOut} className="btn btn-sm lg:btn-md">

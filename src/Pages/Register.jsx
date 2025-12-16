@@ -24,7 +24,8 @@ const Register = () => {
         const name = e.target.name.value;
         const photoUrl = e.target.photoUrl;
         const file = photoUrl.files[0];
-        console.log(file);
+        const role = e.target.role.value;
+        
 
         const uppercase = /[A-Z]/;
         const lowercase = /[a-z]/;
@@ -52,7 +53,8 @@ const Register = () => {
             email,
             name,
             pass,
-            mainPhotoUrl
+            mainPhotoUrl,
+            role
         }
 
 
@@ -112,7 +114,7 @@ const Register = () => {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen mt-8 bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div className="text-center">
                     <h2 className="text-4xl font-bold text-gray-900 mb-2">
@@ -158,6 +160,17 @@ const Register = () => {
                                 placeholder="Enter your photoURL"
                                 className="input input-bordered w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                             />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Choose a role
+                            </label>
+                            <select name='role' defaultValue="Choose Role" className="select w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                                <option disabled={true}>Choose Role</option>
+                                <option value='manager'>Manager</option>
+                                <option value='buyer'>Buyer</option>
+                            </select>
                         </div>
 
                         <div>
