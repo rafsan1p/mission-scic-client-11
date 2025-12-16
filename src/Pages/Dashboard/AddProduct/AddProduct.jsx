@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Package, DollarSign, Hash, Image, CreditCard, Home } from 'lucide-react';
+import axios from 'axios';
 
 const AddProduct = () => {
   const [showOnHome, setShowOnHome] = useState(false);
@@ -10,7 +11,7 @@ const AddProduct = () => {
     setSelectedFiles(files);
   };
 
-  const handleAddProduct = (e) =>{
+  const handleAddProduct = async(e) =>{
     e.preventDefault();
     const form = e.target;
     const productName = form.productName.value;
@@ -19,22 +20,41 @@ const AddProduct = () => {
     const price = form.price.value;
     const quantity = form.quantity.value;
     const moq = form.moq.value;
-    const productImage = form.productImage.files;
     const paymentOption = form.paymentOption.value;
+    const productImage = form.productImage;
 
-    const formData = {
+    const file = productImage.files[0];
+
+    const imgbbKey = import.meta.env.VITE_IMGBB_API_KEY;
+    const res = await axios.post(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {image:file}, {
+            headers:{
+                'Content-Type':'multipart/form-data'
+            }
+        })
+        const mainPhotoUrl = res.data.data.display_url
+
+        const formData = {
       productName,
       description,
       category,
-      price, 
-      quantity,
-      moq,
-      productImage,
+      price:parseInt(price), 
+      quantity:parseInt(quantity),
+      moq:parseInt(moq),
+      productImage:mainPhotoUrl,
       paymentOption,
       showOnHome
     }
-    console.log(formData);
 
+        if(res.data.success == true){
+          axios.post('http://localhost:5000/products', formData)
+          .then(res =>{
+            console.log(res.data);
+            alert(res.data.insertedId)
+          })
+          .catch(err => console.log(err))
+        }
+
+    
   }
 
   return (
@@ -56,6 +76,7 @@ const AddProduct = () => {
               <input
                 type="text"
                 name="productName"
+                required
                 placeholder="Enter product name"
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
               />
@@ -71,6 +92,7 @@ const AddProduct = () => {
               </label>
               <textarea
                 name="description"
+                required
                 rows="4"
                 placeholder="Write detailed product information..."
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-slate-400"
@@ -89,6 +111,7 @@ const AddProduct = () => {
                 </label>
                 <select
                   name="category"
+                  required
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -113,6 +136,7 @@ const AddProduct = () => {
                 </label>
                 <select
                   name="paymentOption"
+                  required
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -141,6 +165,7 @@ const AddProduct = () => {
                   <input
                     type="number"
                     name="price"
+                    required
                     placeholder="0.00"
                     className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
                   />
@@ -156,6 +181,7 @@ const AddProduct = () => {
                 <input
                   type="number"
                   name="quantity"
+                  required
                   placeholder="0"
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
                 />
@@ -170,6 +196,7 @@ const AddProduct = () => {
                 <input
                   type="number"
                   name="moq"
+                  required
                   placeholder="0"
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
                 />
@@ -186,6 +213,7 @@ const AddProduct = () => {
                 <input
                   type="file"
                   name="productImage"
+                  required
                   multiple
                   accept="image/*"
                   onChange={handleFileChange}
