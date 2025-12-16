@@ -1,59 +1,63 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Droplet, User, Mail, MapPin, Building2, Calendar, Clock, MessageSquare } from 'lucide-react';
+import { AuthContext } from '../../../Provider/AuthProvider';
+import axios from 'axios';
+import useAxios from '../../../hooks/useAxios';
 
-const BloodDonationForm = () => {
-  const [formData, setFormData] = useState({
-    requesterName: 'John Doe', 
-    requesterEmail: 'john.doe@example.com',
-    recipientName: '',
-    recipientDistrict: '',
-    recipientUpazila: '',
-    hospitalName: '',
-    fullAddress: '',
-    bloodGroup: '',
-    donationDate: '',
-    donationTime: '',
-    requestMessage: '',
-    donationStatus: 'pending' // Default value, not shown in form
-  });
+const AddRequest = () => {
 
-  const districts = [
-    'Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 
-    'Rangpur', 'Mymensingh', 'Comilla', 'Gazipur', 'Narayanganj', 'Jessore'
-  ];
+    const {user} = useContext(AuthContext);
+    const [upazilas, setUpazilas] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [district, setDistrict] = useState('');
+    const [upazila, setUpazila] = useState('');
 
-  const upazilas = {
-    'Dhaka': ['Dhanmondi', 'Gulshan', 'Mirpur', 'Mohammadpur', 'Uttara', 'Tejgaon'],
-    'Chattogram': ['Patenga', 'Kotwali', 'Double Mooring', 'Pahartali', 'Halishahar'],
-    'Rajshahi': ['Boalia', 'Motihar', 'Rajpara', 'Shah Makhdum'],
-    'Khulna': ['Sonadanga', 'Khalishpur', 'Daulatpur', 'Khan Jahan Ali'],
-    'Barishal': ['Kotwali', 'Bakerganj', 'Banaripara'],
-    'Sylhet': ['Jalalabad', 'South Surma', 'Companiganj'],
-    'Rangpur': ['Rangpur Sadar', 'Mithapukur', 'Badarganj'],
-    'Mymensingh': ['Mymensingh Sadar', 'Muktagacha', 'Trishal'],
-    'Comilla': ['Comilla Sadar', 'Laksam', 'Daudkandi'],
-    'Gazipur': ['Gazipur Sadar', 'Kaliakair', 'Kapasia'],
-    'Narayanganj': ['Narayanganj Sadar', 'Rupganj', 'Sonargaon'],
-    'Jessore': ['Jessore Sadar', 'Jhikargachha', 'Sharsha']
-  };
+    const axiosInstance = useAxios();
 
-  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    useEffect(()=>{
+        axios.get('/upazila.json')
+        .then(res=>{
+            setUpazilas(res.data.upazilas)
+        })
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Blood Donation Request:', formData);
-    alert('Blood donation request submitted successfully!');
-  };
+        axios.get('/district.json')
+        .then(res=>{
+            setDistricts(res.data.districts)
+        })
+    }, [])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-      // Reset upazila when district changes
-      ...(name === 'recipientDistrict' && { recipientUpazila: '' })
-    }));
-  };
+    const handleRequest = (e) => {
+        e.preventDefault();
+        const form = e.target
+
+        const requester_name = form.requester_name.value;
+        const requester_email = form.requester_email.value;
+        const recipient_name = form.recipient_name.value;
+        const recipient_district = district;
+        const recipient_upazila = upazila;
+        const hospital_name = form.hospital_name.value;
+        const full_address = form.full_address.value;
+        const blood_group = form.blood_group.value;
+
+        const formData = {
+            requester_name,
+            requester_email,
+            recipient_name,
+            recipient_district,
+            recipient_upazila,
+            hospital_name,
+            full_address,
+            blood_group,
+            donation_status:'pending'
+        }
+        axiosInstance.post('/requests', formData)
+        .then(res=>{
+            alert(res.data.insertedId);
+        })
+        .catch(err=> console.log(err));
+    };
+
+  
 
   return (
     <div className="min-h-screen bg-linear-to-br from-red-50 via-pink-50 to-rose-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -70,7 +74,7 @@ const BloodDonationForm = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl border border-gray-200">
+        <form onSubmit={handleRequest} className="bg-white rounded-2xl shadow-xl border border-gray-200">
           <div className="p-6 sm:p-8 space-y-6">
             
             {/* Requester Information (Read Only) */}
@@ -84,8 +88,8 @@ const BloodDonationForm = () => {
                   <label className="block text-xs font-medium text-gray-600 mb-1">Your Name</label>
                   <input
                     type="text"
-                    name="requesterName"
-                    value={formData.requesterName}
+                    name="requester_name"
+                    value={user?.displayName}
                     readOnly
                     className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
                   />
@@ -94,8 +98,8 @@ const BloodDonationForm = () => {
                   <label className="block text-xs font-medium text-gray-600 mb-1">Your Email</label>
                   <input
                     type="email"
-                    name="requesterEmail"
-                    value={formData.requesterEmail}
+                    name="requester_email"
+                    value={user?.email}
                     readOnly
                     className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
                   />
@@ -117,9 +121,7 @@ const BloodDonationForm = () => {
                   </label>
                   <input
                     type="text"
-                    name="recipientName"
-                    value={formData.recipientName}
-                    onChange={handleChange}
+                    name="recipient_name"
                     placeholder="Enter recipient's full name"
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder:text-gray-400"
@@ -134,9 +136,9 @@ const BloodDonationForm = () => {
                       Recipient District *
                     </label>
                     <select
-                      name="recipientDistrict"
-                      value={formData.recipientDistrict}
-                      onChange={handleChange}
+                      name="recipient_district"
+                      value={district}
+                      onChange={(e)=> setDistrict(e.target.value)}
                       required
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                       style={{
@@ -146,10 +148,10 @@ const BloodDonationForm = () => {
                         backgroundSize: '1.25em 1.25em'
                       }}
                     >
-                      <option value="">Select district</option>
-                      {districts.map(district => (
-                        <option key={district} value={district}>{district}</option>
-                      ))}
+                      <option disabled={true}>Select your District</option>
+                        {
+                            districts.map(d=> <option value={d?.name} key={d.id}>{d?.name}</option>)
+                        }
                     </select>
                   </div>
 
@@ -159,11 +161,10 @@ const BloodDonationForm = () => {
                       Recipient Upazila *
                     </label>
                     <select
-                      name="recipientUpazila"
-                      value={formData.recipientUpazila}
-                      onChange={handleChange}
+                      name="recipient_upazila"
+                      value={upazila}
+                      onChange={(e)=> setUpazila(e.target.value)}
                       required
-                      disabled={!formData.recipientDistrict}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -172,10 +173,10 @@ const BloodDonationForm = () => {
                         backgroundSize: '1.25em 1.25em'
                       }}
                     >
-                      <option value="">Select upazila</option>
-                      {formData.recipientDistrict && upazilas[formData.recipientDistrict]?.map(upazila => (
-                        <option key={upazila} value={upazila}>{upazila}</option>
-                      ))}
+                      <option disabled={true}>Select your Upazila</option>
+                        {
+                            upazilas.map(u=> <option value={u?.name} key={u.id}>{u?.name}</option>)
+                        }
                     </select>
                   </div>
                 </div>
@@ -188,9 +189,7 @@ const BloodDonationForm = () => {
                   </label>
                   <input
                     type="text"
-                    name="hospitalName"
-                    value={formData.hospitalName}
-                    onChange={handleChange}
+                    name="hospital_name"
                     placeholder="e.g., Dhaka Medical College Hospital"
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder:text-gray-400"
@@ -205,9 +204,7 @@ const BloodDonationForm = () => {
                   </label>
                   <input
                     type="text"
-                    name="fullAddress"
-                    value={formData.fullAddress}
-                    onChange={handleChange}
+                    name="full_address"
                     placeholder="e.g., Zahir Raihan Rd, Dhaka"
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all placeholder:text-gray-400"
@@ -229,9 +226,7 @@ const BloodDonationForm = () => {
                     Blood Group *
                   </label>
                   <select
-                    name="bloodGroup"
-                    value={formData.bloodGroup}
-                    onChange={handleChange}
+                    name="blood_group"
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                     style={{
@@ -241,10 +236,15 @@ const BloodDonationForm = () => {
                       backgroundSize: '1.25em 1.25em'
                     }}
                   >
-                    <option value="">Select blood group</option>
-                    {bloodGroups.map(group => (
-                      <option key={group} value={group}>{group}</option>
-                    ))}
+                    <option disabled={true}>Choose Blood Group</option>
+                    <option value='A+'>A+</option>
+                    <option value='A-'>A-</option>
+                    <option value='B+'>B+</option>
+                    <option value='B-'>B-</option>
+                    <option value='O+'>O+</option>
+                    <option value='O-'>O-</option>
+                    <option value='AB+'>AB+</option>
+                    <option value='AB-'>AB-</option>
                   </select>
                 </div>
 
@@ -258,8 +258,6 @@ const BloodDonationForm = () => {
                     <input
                       type="date"
                       name="donationDate"
-                      value={formData.donationDate}
-                      onChange={handleChange}
                       required
                       min={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
@@ -274,8 +272,6 @@ const BloodDonationForm = () => {
                     <input
                       type="time"
                       name="donationTime"
-                      value={formData.donationTime}
-                      onChange={handleChange}
                       required
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                     />
@@ -290,8 +286,6 @@ const BloodDonationForm = () => {
                   </label>
                   <textarea
                     name="requestMessage"
-                    value={formData.requestMessage}
-                    onChange={handleChange}
                     rows="4"
                     placeholder="Please explain why you need blood donation in detail..."
                     required
@@ -323,4 +317,4 @@ const BloodDonationForm = () => {
   );
 };
 
-export default BloodDonationForm;
+export default AddRequest;
