@@ -1,5 +1,6 @@
-import { Home, Users, Settings, BarChart3, LogOut } from "lucide-react";
+import { Home, Users, Settings, BarChart3, LogOut, PackagePlus, Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 const navClass = ({ isActive }) =>
   `w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
@@ -9,49 +10,72 @@ const navClass = ({ isActive }) =>
   }`;
 
 export default function Aside() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <aside className="h-screen w-64 bg-slate-900 text-slate-100 flex flex-col shadow-xl">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-800">
-        <h1 className="text-2xl font-bold tracking-wide bg-linear-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent drop-shadow">
-          AdminPanel
-        </h1>
-      </div>
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg"
+      >
+        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
 
-      <div className="flex-1 px-3 py-4 space-y-1">
-        <NavLink to="/dashboard/main" className={navClass}>
-          <Home className="w-5 h-5" />
-          Dashboard
-        </NavLink>
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
-        <NavLink to="/dashboard/add-product" className={navClass}>
-          <Home className="w-5 h-5" />
-          Add Product
-        </NavLink>
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col shadow-xl z-40 transition-transform duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        {/* Logo */}
+        <div className="h-16 flex items-center px-6 border-b border-slate-800">
+          <h1 className="text-2xl font-bold tracking-wide bg-linear-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent drop-shadow">
+            AdminPanel
+          </h1>
+        </div>
 
-        <NavLink to="/dashboard/users" className={navClass}>
-          <BarChart3 className="w-5 h-5" />
-          Analytics
-        </NavLink>
+        <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <NavLink to="/dashboard/main" className={navClass} onClick={() => setIsOpen(false)}>
+            <Home className="w-5 h-5" />
+            Dashboard
+          </NavLink>
 
-        <NavLink to="/users" className={navClass}>
-          <Users className="w-5 h-5" />
-          Users
-        </NavLink>
+          <NavLink to="/dashboard/add-product" className={navClass} onClick={() => setIsOpen(false)}>
+            <PackagePlus className="w-5 h-5" />
+            Add Product
+          </NavLink>
 
-        <NavLink to="/settings" className={navClass}>
-          <Settings className="w-5 h-5" />
-          Settings
-        </NavLink>
-      </div>
+          <NavLink to="/dashboard/users" className={navClass} onClick={() => setIsOpen(false)}>
+            <BarChart3 className="w-5 h-5" />
+            Analytics
+          </NavLink>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-800">
-        <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
-          <LogOut className="w-5 h-5" />
-          Logout
-        </button>
-      </div>
-    </aside>
+          <NavLink to="/users" className={navClass} onClick={() => setIsOpen(false)}>
+            <Users className="w-5 h-5" />
+            Users
+          </NavLink>
+
+          <NavLink to="/settings" className={navClass} onClick={() => setIsOpen(false)}>
+            <Settings className="w-5 h-5" />
+            Settings
+          </NavLink>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-800">
+          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -5,6 +5,8 @@ import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import DashboardLayout from "../DashboardLayout/DashboardLayout";
 import MainDashboard from "../Pages/Dashboard/MainDashboard/MainDashboard";
+import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
+import Error from "../Pages/Error";
 
 
 
@@ -12,6 +14,7 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <RootLayout></RootLayout>,
+        errorElement: <Error></Error>,
         children: [
             {
                 path: '/',
@@ -34,6 +37,10 @@ const router = createBrowserRouter([
             {
                 path:'main',
                 element: <MainDashboard></MainDashboard>
+            },
+            {
+                path:'add-product',
+                element: <AddProduct></AddProduct>
             }
         ]
     }
