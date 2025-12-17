@@ -1,6 +1,9 @@
-import { Home, Users, Settings, BarChart3, LogOut, PackagePlus, Menu, X } from "lucide-react";
+import { Home, Users, Settings, BarChart3, LogOut, PackagePlus, Menu, X, Users2 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../Provider/AuthProvider";
+import { signOut } from "firebase/auth";
+import auth from "../../firebase/firebase.config";
 
 const navClass = ({ isActive }) =>
   `w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
@@ -9,8 +12,12 @@ const navClass = ({ isActive }) =>
       : "text-slate-300 hover:text-white hover:bg-slate-800"
   }`;
 
-export default function Aside() {
+  export default function Aside() {
   const [isOpen, setIsOpen] = useState(false);
+  const {role} = useContext(AuthContext)
+  const handleLogout = ()=>{
+    signOut(auth)
+  }
 
   return (
     <>
@@ -47,10 +54,17 @@ export default function Aside() {
             Dashboard
           </NavLink>
 
-          <NavLink to="/dashboard/add-request" className={navClass} onClick={() => setIsOpen(false)}>
-            <PackagePlus className="w-5 h-5" />
-            Add Request
-          </NavLink>
+          {
+            role == 'donor' && (<NavLink to="/dashboard/add-request"
+                className={navClass} onClick={() => setIsOpen(false)}>
+                <PackagePlus className="w-5 h-5" />
+                Add Request
+              </NavLink>)
+          }
+
+          {
+            role == 'admin' && (<NavLink to="/dashboard/all-users" className={navClass} onClick={() => setIsOpen(false)}><Users2 className="w-5 h-5" />All Users</NavLink>)
+          }
 
           <NavLink to="/dashboard/manage-product" className={navClass} onClick={() => setIsOpen(false)}>
             <BarChart3 className="w-5 h-5" />
@@ -70,7 +84,7 @@ export default function Aside() {
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-800">
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
             <LogOut className="w-5 h-5" />
             Logout
           </button>
