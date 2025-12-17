@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Droplet, User, Mail, MapPin, Building2, Calendar, Clock, MessageSquare } from 'lucide-react';
 import { AuthContext } from '../../../Provider/AuthProvider';
 import axios from 'axios';
-import useAxios from '../../../hooks/useAxios';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 const AddRequest = () => {
 
@@ -11,8 +11,8 @@ const AddRequest = () => {
     const [districts, setDistricts] = useState([]);
     const [district, setDistrict] = useState('');
     const [upazila, setUpazila] = useState('');
-
-    const axiosInstance = useAxios();
+    const axiosSecure = useAxiosSecure();
+    const [bloodGroup, setBloodGroup] = useState('');
 
     useEffect(()=>{
         axios.get('/upazila.json')
@@ -50,7 +50,7 @@ const AddRequest = () => {
             blood_group,
             donation_status:'pending'
         }
-        axiosInstance.post('/requests', formData)
+        axiosSecure.post('/requests', formData)
         .then(res=>{
             alert(res.data.insertedId);
         })
@@ -148,7 +148,7 @@ const AddRequest = () => {
                         backgroundSize: '1.25em 1.25em'
                       }}
                     >
-                      <option disabled={true}>Select your District</option>
+                      <option value="" disabled>Select your District</option>
                         {
                             districts.map(d=> <option value={d?.name} key={d.id}>{d?.name}</option>)
                         }
@@ -173,7 +173,7 @@ const AddRequest = () => {
                         backgroundSize: '1.25em 1.25em'
                       }}
                     >
-                      <option disabled={true}>Select your Upazila</option>
+                      <option value="" disabled>Select your Upazila</option>
                         {
                             upazilas.map(u=> <option value={u?.name} key={u.id}>{u?.name}</option>)
                         }
@@ -227,6 +227,8 @@ const AddRequest = () => {
                   </label>
                   <select
                     name="blood_group"
+                    value={bloodGroup}
+                    onChange={(e)=> setBloodGroup(e.target.value)}
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                     style={{
@@ -236,7 +238,7 @@ const AddRequest = () => {
                       backgroundSize: '1.25em 1.25em'
                     }}
                   >
-                    <option disabled={true}>Choose Blood Group</option>
+                    <option value="" disabled>Choose Blood Group</option>
                     <option value='A+'>A+</option>
                     <option value='A-'>A-</option>
                     <option value='B+'>B+</option>
