@@ -66,9 +66,9 @@ const navClass = ({ isActive }) =>
             role == 'admin' && (<NavLink to="/dashboard/all-users" className={navClass} onClick={() => setIsOpen(false)}><Users2 className="w-5 h-5" />All Users</NavLink>)
           }
 
-          <NavLink to="/dashboard/manage-product" className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/dashboard/my-request" className={navClass} onClick={() => setIsOpen(false)}>
             <BarChart3 className="w-5 h-5" />
-            Manage Product
+            My Request
           </NavLink>
 
           <NavLink to="/users" className={navClass} onClick={() => setIsOpen(false)}>
@@ -76,10 +76,10 @@ const navClass = ({ isActive }) =>
             Users
           </NavLink>
 
-          <NavLink to="/settings" className={navClass} onClick={() => setIsOpen(false)}>
+          {/* <NavLink to="/settings" className={navClass} onClick={() => setIsOpen(false)}>
             <Settings className="w-5 h-5" />
             Settings
-          </NavLink>
+          </NavLink> */}
         </div>
 
         {/* Footer */}
