@@ -153,7 +153,7 @@ const Navbar = () => {
           </li>
           <li>
             <NavLink
-              to="/"
+              to="/search"
               className={({ isActive }) =>
                 isActive ? "text-primary font-bold" : ""
               }

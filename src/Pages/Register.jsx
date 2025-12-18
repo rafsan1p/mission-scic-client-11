@@ -75,7 +75,7 @@ const Register = () => {
             mainPhotoUrl,
             blood,
             district,
-            upazila
+            upazila,
         }
 
 
