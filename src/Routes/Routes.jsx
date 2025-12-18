@@ -11,6 +11,8 @@ import AddRequest from "../Pages/Dashboard/AddRequest/AddRequest";
 import AllUsers from "../Pages/Dashboard/AllUsers/AllUsers";
 import PrivateRoute from "./PrivateRoute";
 import MyRequest from "../Pages/Dashboard/MyRequest/MyRequest";
+import Donate from "../Pages/Donate/Donate";
+import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
 
 
 
@@ -29,8 +31,16 @@ const router = createBrowserRouter([
                 Component:Login
             },
             {
-                path: 'signup',
+                path: '/signup',
                 Component:Register
+            },
+            {
+                path: '/donate',
+                Component:Donate
+            },
+            {
+                path: '/payment-success',
+                Component:PaymentSuccess
             }
         ]
     },

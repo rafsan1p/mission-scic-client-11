@@ -66,7 +66,7 @@ const Navbar = () => {
                 Home
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink
                 to="/services"
                 className={({ isActive }) =>
@@ -75,9 +75,9 @@ const Navbar = () => {
               >
                 Services
               </NavLink>
-            </li>
+            </li> */}
 
-            {user && (
+            {/* {user && (
               <>
                 <li>
                   <NavLink
@@ -120,17 +120,12 @@ const Navbar = () => {
                   </NavLink>
                 </li>
               </>
-            )}
+            )} */}
           </ul>
         </div>
         <NavLink to="/" className="flex items-center gap-2 ml-1">
-          <div className="relative hidden sm:block">
-            <div className="w-10 h-10 bg-linear-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-              <span className="text-2xl">🐾</span>
-            </div>
-          </div>
           <span className="font-bold text-lg sm:text-xl bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-            PawMart
+            BloodBank
           </span>
         </NavLink>
       </div>
@@ -144,6 +139,36 @@ const Navbar = () => {
               }
             >
               Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              All Request
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              Search
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/donate"
+              className={({ isActive }) =>
+                isActive ? "text-primary font-bold" : ""
+              }
+            >
+              Donate
             </NavLink>
           </li>
           {/* <li>
