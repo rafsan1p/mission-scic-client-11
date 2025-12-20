@@ -1,9 +1,10 @@
-import { Home, Users, Settings, BarChart3, LogOut, PackagePlus, Menu, X, Users2 } from "lucide-react";
+import { Home, Users, Settings, BarChart3, LogOut, PackagePlus, Menu, X, Users2, Droplet, DollarSign, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
 import { signOut } from "firebase/auth";
 import auth from "../../firebase/firebase.config";
+import toast from "react-hot-toast";
 
 const navClass = ({ isActive }) =>
   `w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
@@ -12,11 +13,13 @@ const navClass = ({ isActive }) =>
       : "text-slate-300 hover:text-white hover:bg-slate-800"
   }`;
 
-  export default function Aside() {
+export default function Aside() {
   const [isOpen, setIsOpen] = useState(false);
-  const {role} = useContext(AuthContext)
-  const handleLogout = ()=>{
-    signOut(auth)
+  const {role} = useContext(AuthContext);
+  
+  const handleLogout = () => {
+    signOut(auth);
+    toast.success('Logged out successfully!');
   }
 
   return (
@@ -43,48 +46,95 @@ const navClass = ({ isActive }) =>
       }`}>
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <h1 className="text-2xl font-bold tracking-wide bg-linear-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent drop-shadow">
-            AdminPanel
+          <Droplet className="w-6 h-6 text-red-500 fill-red-500 mr-2" />
+          <h1 className="text-xl font-bold tracking-wide bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent drop-shadow">
+            BloodBridge
           </h1>
         </div>
 
         <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          {/* Common Routes */}
           <NavLink to="/dashboard" end className={navClass} onClick={() => setIsOpen(false)}>
             <Home className="w-5 h-5" />
             Dashboard
           </NavLink>
 
-          {
-            role == 'donor' && (<NavLink to="/dashboard/add-request"
-                className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/dashboard/profile" className={navClass} onClick={() => setIsOpen(false)}>
+            <User className="w-5 h-5" />
+            Profile
+          </NavLink>
+
+          {/* Donor Routes */}
+          {role === 'donor' && (
+            <>
+              <NavLink to="/dashboard/add-request" className={navClass} onClick={() => setIsOpen(false)}>
                 <PackagePlus className="w-5 h-5" />
-                Add Request
-              </NavLink>)
-          }
+                Create Request
+              </NavLink>
 
-          {
-            role == 'admin' && (<NavLink to="/dashboard/all-users" className={navClass} onClick={() => setIsOpen(false)}><Users2 className="w-5 h-5" />All Users</NavLink>)
-          }
+              <NavLink to="/dashboard/my-request" className={navClass} onClick={() => setIsOpen(false)}>
+                <BarChart3 className="w-5 h-5" />
+                My Requests
+              </NavLink>
+            </>
+          )}
 
-          <NavLink to="/dashboard/my-request" className={navClass} onClick={() => setIsOpen(false)}>
-            <BarChart3 className="w-5 h-5" />
-            My Request
+          {/* Admin Routes */}
+          {role === 'admin' && (
+            <>
+              <NavLink to="/dashboard/all-users" className={navClass} onClick={() => setIsOpen(false)}>
+                <Users2 className="w-5 h-5" />
+                All Users
+              </NavLink>
+
+              <NavLink to="/dashboard/all-blood-donation-request" className={navClass} onClick={() => setIsOpen(false)}>
+                <Droplet className="w-5 h-5" />
+                All Requests
+              </NavLink>
+
+              <NavLink to="/dashboard/funding" className={navClass} onClick={() => setIsOpen(false)}>
+                <DollarSign className="w-5 h-5" />
+                Funding
+              </NavLink>
+            </>
+          )}
+
+          {/* Volunteer Routes */}
+          {role === 'volunteer' && (
+            <>
+              <NavLink to="/dashboard/all-blood-donation-request" className={navClass} onClick={() => setIsOpen(false)}>
+                <Droplet className="w-5 h-5" />
+                All Requests
+              </NavLink>
+
+              <NavLink to="/dashboard/funding" className={navClass} onClick={() => setIsOpen(false)}>
+                <DollarSign className="w-5 h-5" />
+                Funding
+              </NavLink>
+            </>
+          )}
+
+          {/* Divider */}
+          <div className="border-t border-slate-800 my-4"></div>
+
+          {/* Public Links */}
+          <NavLink to="/donation-requests" className={navClass} onClick={() => setIsOpen(false)}>
+            <Droplet className="w-5 h-5" />
+            Browse Requests
           </NavLink>
 
-          <NavLink to="/users" className={navClass} onClick={() => setIsOpen(false)}>
+          <NavLink to="/search-donors" className={navClass} onClick={() => setIsOpen(false)}>
             <Users className="w-5 h-5" />
-            Users
+            Search Donors
           </NavLink>
-
-          {/* <NavLink to="/settings" className={navClass} onClick={() => setIsOpen(false)}>
-            <Settings className="w-5 h-5" />
-            Settings
-          </NavLink> */}
         </div>
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-800">
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition">
+          <button 
+            onClick={handleLogout} 
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition"
+          >
             <LogOut className="w-5 h-5" />
             Logout
           </button>

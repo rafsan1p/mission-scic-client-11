@@ -5,6 +5,7 @@ import { signOut } from "firebase/auth";
 import auth from "../../firebase/firebase.config";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
+import { Droplet } from "lucide-react";
 
 const Navbar = () => {
   const { user } = useContext(AuthContext);
@@ -66,69 +67,48 @@ const Navbar = () => {
                 Home
               </NavLink>
             </li>
-            {/* <li>
+            <li>
               <NavLink
-                to="/services"
+                to="/donation-requests"
                 className={({ isActive }) =>
                   isActive ? "text-primary font-bold" : ""
                 }
               >
-                Services
+                Donation Requests
               </NavLink>
-            </li> */}
-
-            {/* {user && (
-              <>
-                <li>
-                  <NavLink
-                    to={"/profile"}
-                    className={({ isActive }) =>
-                      isActive ? "text-primary font-bold" : ""
-                    }
-                  >
-                    My Profile
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={"/add-services"}
-                    className={({ isActive }) =>
-                      isActive ? "text-primary font-bold" : ""
-                    }
-                  >
-                    Add Services
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={"/my-services"}
-                    className={({ isActive }) =>
-                      isActive ? "text-primary font-bold" : ""
-                    }
-                  >
-                    My Services
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={"/my-orders"}
-                    className={({ isActive }) =>
-                      isActive ? "text-primary font-bold" : ""
-                    }
-                  >
-                    My Orders
-                  </NavLink>
-                </li>
-              </>
-            )} */}
+            </li>
+            <li>
+              <NavLink
+                to="/search-donors"
+                className={({ isActive }) =>
+                  isActive ? "text-primary font-bold" : ""
+                }
+              >
+                Search Donors
+              </NavLink>
+            </li>
+            {user && (
+              <li>
+                <NavLink
+                  to="/dashboard/funding"
+                  className={({ isActive }) =>
+                    isActive ? "text-primary font-bold" : ""
+                  }
+                >
+                  Funding
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
         <NavLink to="/" className="flex items-center gap-2 ml-1">
-          <span className="font-bold text-lg sm:text-xl bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-            BloodBank
+          <Droplet className="w-6 h-6 text-red-500 fill-red-500" />
+          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-red-500 to-rose-600 bg-clip-text text-transparent">
+            BloodBridge
           </span>
         </NavLink>
       </div>
+      
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
@@ -143,89 +123,36 @@ const Navbar = () => {
           </li>
           <li>
             <NavLink
-              to="/"
+              to="/donation-requests"
               className={({ isActive }) =>
                 isActive ? "text-primary font-bold" : ""
               }
             >
-              All Request
+              Donation Requests
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/search"
+              to="/search-donors"
               className={({ isActive }) =>
                 isActive ? "text-primary font-bold" : ""
               }
             >
-              Search
+              Search Donors
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/donate"
-              className={({ isActive }) =>
-                isActive ? "text-primary font-bold" : ""
-              }
-            >
-              Donate
-            </NavLink>
-          </li>
-          {/* <li>
-            <NavLink
-              to="/services"
-              className={({ isActive }) =>
-                isActive ? "text-primary font-bold" : ""
-              }
-            >
-              Services
-            </NavLink>
-          </li>
-
           {user && (
-            <>
-              <li>
-                <NavLink
-                  to={"/profile"}
-                  className={({ isActive }) =>
-                    isActive ? "text-primary font-bold" : ""
-                  }
-                >
-                  My Profile
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/add-services"}
-                  className={({ isActive }) =>
-                    isActive ? "text-primary font-bold" : ""
-                  }
-                >
-                  Add Services
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/my-services"}
-                  className={({ isActive }) =>
-                    isActive ? "text-primary font-bold" : ""
-                  }
-                >
-                  My Services
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={"/my-orders"}
-                  className={({ isActive }) =>
-                    isActive ? "text-primary font-bold" : ""
-                  }
-                >
-                  My Orders
-                </NavLink>
-              </li>
-            </>
-          )} */}
+            <li>
+              <NavLink
+                to="/dashboard/funding"
+                className={({ isActive }) =>
+                  isActive ? "text-primary font-bold" : ""
+                }
+              >
+                Funding
+              </NavLink>
+            </li>
+          )}
         </ul>
       </div>
 
@@ -280,15 +207,21 @@ const Navbar = () => {
             </g>
           </svg>
         </label>
-        <Link to={'/dashboard'} className="btn btn-sm lg:btn-md">Dashboard</Link>
 
         {user && (
-          <button onClick={handleSignOut} className="btn btn-sm lg:btn-md">
+          <Link to={'/dashboard'} className="btn btn-sm lg:btn-md btn-primary">
+            Dashboard
+          </Link>
+        )}
+
+        {user && (
+          <button onClick={handleSignOut} className="btn btn-sm lg:btn-md btn-outline btn-error">
             Logout
           </button>
         )}
+        
         {!user && (
-          <NavLink to={"/login"} className="btn btn-sm lg:btn-md">
+          <NavLink to={"/login"} className="btn btn-sm lg:btn-md btn-primary">
             Login
           </NavLink>
         )}

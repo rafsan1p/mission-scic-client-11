@@ -1,8 +1,8 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import auth from "../firebase/firebase.config";
-import { AuthContext } from "../Provider/AuthProvider";
+import auth from "../../firebase/firebase.config";
+import { AuthContext } from "../../Provider/AuthProvider";
 import toast from "react-hot-toast";
 
 const Login = () => {

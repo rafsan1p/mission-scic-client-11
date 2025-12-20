@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import toast from "react-hot-toast";
 import { Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { Link } from "react-router";
 import Swal from "sweetalert2";
+import { AuthContext } from "../../../Provider/AuthProvider";
 
-const MyRequest = () => {
+const AllBloodDonationRequestAdmin = () => {
+  const { role } = useContext(AuthContext);
   const [totalRequest, setTotalRequest] = useState(0);
-  const [myRequests, setMyRequests] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('all');
@@ -18,9 +20,9 @@ const MyRequest = () => {
     setLoading(true);
     try {
       const res = await axiosSecure.get(
-        `/my-request?page=${currentPage - 1}&size=${itemsPerPage}&status=${filter}`
+        `/all-requests?page=${currentPage - 1}&size=${itemsPerPage}&status=${filter}`
       );
-      setMyRequests(res.data.request);
+      setRequests(res.data.requests);
       setTotalRequest(res.data.totalRequest);
     } catch(err) {
       toast.error('Failed to load requests');
@@ -49,6 +51,12 @@ const MyRequest = () => {
   };
 
   const handleDelete = async (id) => {
+    // Only admins can delete
+    if (role !== 'admin') {
+      toast.error('Only admins can delete requests');
+      return;
+    }
+
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -93,7 +101,9 @@ const MyRequest = () => {
   return (
     <div className="p-3 lg:p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">My Donation Requests</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          All Blood Donation Requests
+        </h1>
         
         {/* Filter */}
         <div className="flex gap-2 flex-wrap">
@@ -141,7 +151,8 @@ const MyRequest = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Recipient Name</th>
+                  <th>Requester</th>
+                  <th>Recipient</th>
                   <th>Location</th>
                   <th>Blood Group</th>
                   <th>Date</th>
@@ -152,16 +163,22 @@ const MyRequest = () => {
                 </tr>
               </thead>
               <tbody>
-                {myRequests.length === 0 ? (
+                {requests.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="text-center py-8 text-gray-500">
+                    <td colSpan="10" className="text-center py-8 text-gray-500">
                       No requests found
                     </td>
                   </tr>
                 ) : (
-                  myRequests.map((request, index) => (
+                  requests.map((request, index) => (
                     <tr key={request._id}>
                       <th>{(currentPage * itemsPerPage) + (index + 1) - itemsPerPage}</th>
+                      <td>
+                        <div className="text-xs">
+                          <div className="font-semibold">{request.requester_name}</div>
+                          <div className="text-gray-500">{request.requester_email}</div>
+                        </div>
+                      </td>
                       <td className="font-medium">{request.recipient_name}</td>
                       <td>
                         <div className="text-sm">
@@ -201,8 +218,8 @@ const MyRequest = () => {
                             <Eye className="w-3 h-3" />
                           </Link>
 
-                          {/* Edit Button - Only for pending/inprogress */}
-                          {(request.donation_status === 'pending' || request.donation_status === 'inprogress') && (
+                          {/* Edit Button - Only admin */}
+                          {role === 'admin' && (request.donation_status === 'pending' || request.donation_status === 'inprogress') && (
                             <Link
                               to={`/dashboard/edit-request/${request._id}`}
                               className="btn btn-xs btn-warning text-white"
@@ -212,16 +229,18 @@ const MyRequest = () => {
                             </Link>
                           )}
 
-                          {/* Delete Button */}
-                          <button
-                            onClick={() => handleDelete(request._id)}
-                            className="btn btn-xs btn-error text-white"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                          {/* Delete Button - Only admin */}
+                          {role === 'admin' && (
+                            <button
+                              onClick={() => handleDelete(request._id)}
+                              className="btn btn-xs btn-error text-white"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
 
-                          {/* Status Change Buttons */}
+                          {/* Status Update Buttons */}
                           {request.donation_status === 'inprogress' && (
                             <>
                               <button
@@ -279,10 +298,19 @@ const MyRequest = () => {
               </button>
             </div>
           )}
+
+          {/* Permissions Info for Volunteer */}
+          {role === 'volunteer' && (
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Volunteer Permissions:</strong> You can view all requests and update donation status only. Edit and delete actions are restricted to admins.
+              </p>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 };
 
-export default MyRequest;
+export default AllBloodDonationRequestAdmin;

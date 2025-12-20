@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { AuthContext } from '../Provider/AuthProvider';
+import { AuthContext } from '../../Provider/AuthProvider';
 import { updateProfile } from 'firebase/auth';
-import auth from '../firebase/firebase.config';
+import auth from '../../firebase/firebase.config';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
